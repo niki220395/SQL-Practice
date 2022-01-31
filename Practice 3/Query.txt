@@ -1,0 +1,63 @@
+Query for Practice 3
+
+
+create database airport;
+use airport;
+
+-- a)
+CREATE TABLE flights (flightID INT NOT NULL AUTO_INCREMENT, startDestination VARCHAR(45) NOT NULL, finalDestination VARCHAR(45) NOT NULL, flightTime INT, flightStatus CHAR NOT NULL, fuelComsuption INT NOT NULL, PRIMARY KEY (flightID) );
+
+INSERT INTO flights (startDestination, finalDestination, flightTime, flightStatus, fuelComsuption)
+VALUES ('Beograd', 'Rim', 20190125, 'T', 0), ('Rim', 'Pariz', 20190127, 'K', 0), ('Beograd', 'Berlin', 20180305, 'O', 0),('Beograd', 'NYC', NULL, 'K', 0), ('Rim', 'Istanbul', 20190128, 'K', 0), ('Istanbul', 'NYC', 20180201, 'Z', 5000);
+
+
+CREATE TABLE airplaneTickets (ticketID INT NOT NULL AUTO_INCREMENT, flightID INT, price INT, cardStatus CHAR NOT NULL, PRIMARY KEY (ticketID), FOREIGN KEY (flightID) REFERENCES flights(flightID) );
+
+INSERT INTO airplaneTickets (flightID, price, cardStatus)
+VALUES (1,200,'K'), (1,300,'N'), (1,100,'K'), (2,400,'K'), (2,500,'K'), (3,700,'K');
+
+-- b)
+
+DELETE FROM flights  WHERE startDestination = 'Rim';
+
+-- c)
+UPDATE airplaneTickets
+SET price = 450 
+WHERE price > 450 AND cardStatus = 'N';
+
+-- d)
+INSERT INTO airplaneTickets
+VALUES (7, 3, 450, 'N'), (8, 3, 400, 'N');
+
+-- f)
+SELECT flightID, startDestination AS 'Start destination', finalDestination AS 'Final destination' FROM flights
+WHERE flightTime IS NOT NULL;
+
+-- g)
+SELECT SUM(fuelComsuption) AS 'Total fuel comsuption', AVG(fuelComsuption) AS 'Average comsuption' FROM flights
+WHERE startDestination = 'Istanbul' AND flightStatus = 'Z' 
+ORDER BY SUM(fuelComsuption) DESC, AVG(fuelComsuption) DESC;
+
+-- h)
+
+SELECT F.flightID, F.startDestination AS MestoOd, F.finalDestination, SUM(price) FROM flights F, airplaneTickets A 
+WHERE F.flightID = A.flightID AND F.flightStatus != 'O' AND A.cardStatus = 'K' 
+GROUP BY F.flightID, F.startDestination, F.finalDestination;
+
+-- i)
+
+CREATE VIEW AirPlaneTicketsForJanuary AS 
+SELECT A.* 
+FROM airplaneTickets A, flights F 
+WHERE F.flightTime >= 20190101 AND F.flightTime < 20190201 AND A.flightID = F.flightID AND A.cardStatus = 'K'; 
+
+SELECT AVG(price) FROM AirPlaneTicketsForJanuary
+WHERE price > 500; 
+
+-- f)
+
+
+SELECT F.startDestination, MIN(A.price) AS 'min Price', Max(A.price) AS 'max Price' FROM flights F, airplaneTickets A 
+WHERE F.flightID = A.flightID AND F.flightStatus != 'O' AND F.flightTime >= 20180101 AND F.flightTime < 20180501 AND A.cardStatus = 'K' 
+GROUP BY F.finalDestination
+HAVING (SUM(A.price) > 50000 AND COUNT(*) > 100); 

@@ -1,0 +1,59 @@
+Querry for Practice 2 
+
+CREATE database wintervacations;
+USE wintervacations;
+
+-- a)
+CREATE TABLE ski_Center_Info (skiID INT AUTO_INCREMENT PRIMARY KEY, skiCenterName VARCHAR( 45) NOT NULL, numberOfSkiLines INT, 
+artificalSnowing CHAR);
+
+CREATE TABLE booking_info (booking_id INT PRIMARY KEY,start_date DATE, end_date DATE, ski_id INT, price INT);
+
+INSERT INTO ski_Center_Info (skiCenterName, numberOfSkiLines, artificalSnowing) 
+VALUES('Kopaonik', 4, 'N'), ('Zlatibor', 4, 'N'), ( 'Les 2 Alpes', 96, 'D'), ( 'Paradiski', 253, 'D'), ( 'Chatel', 49, null), ('Bansko', 18, 'D');
+
+INSERT INTO booking_info (booking_id, start_date, end_date, ski_id, price)
+VALUES (1, 20211229, 20210105, 1, 350), (2, 20210309, 20210315, 1, 350), (3, 20210307, 20210311, 6, 230), (4, 20210409, 20210415, 3, 450), (5, 20201229, 20210105, 3, 178), (6, 20211225, 20210109, 3, 234);
+
+
+
+-- b)
+DELETE FROM booking_info WHERE price>400;
+
+-- c)
+UPDATE ski_Center_Info SET artificalSnowing = 'D' WHERE skiID = 2;
+
+-- d)
+INSERT INTO booking_info 
+VALUES ( 7, 20190213, 20190217, 1, 170);
+
+-- e)
+SELECT skiID, skiCenterName  AS "Ski Center Name" FROM ski_Center_Info
+WHERE artificalSnowing IS NULL;
+
+-- f)
+SELECT AVG(numberOfSkiLines ) AS "Average line number" 
+FROM ski_Center_Info
+WHERE artificalSnowing = 'D' AND numberOfSkiLines > 10;
+
+-- g)
+SELECT skiCenterName, numberOfSkiLines, start_date, end_date, price FROM booking_info B, ski_Center_Info S 
+WHERE B.ski_id = S.skiID AND numberOfSkiLines > 15 ORDER BY start_date, numberOfSkiLines DESC;
+
+
+
+-- h)
+CREATE VIEW MarchBooking AS 
+SELECT* 
+FROM booking_info 
+WHERE start_date >= 20190301 AND end_date< 20190401; 
+SELECT booking_id, start_date, end_date, price 
+FROM booking_info 
+WHERE price< 200; 
+
+-- j)
+SELECT start_date AS "Start Date" FROM booking_info
+GROUP BY start_date
+HAVING COUNT(*) >= 2;
+
+ 
